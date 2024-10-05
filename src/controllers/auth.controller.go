@@ -82,8 +82,9 @@ func Login(c *gin.Context) {
 
 	// Devolver token al cliente
 	c.JSON(http.StatusOK, gin.H{
-		"id":    user.ID,
-		"email": credentials.Username,
-		"token": tokenString,
+		"success": true,
+		"id":      user.ID,
+		"email":   credentials.Username,
+		"token":   tokenString,
 	})
 }
