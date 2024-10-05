@@ -63,6 +63,29 @@ func (r *Reservation) GetAll(db *sql.DB) ([]Reservation, error) {
 	return reservations, nil
 }
 
+// Verificar la disponibilidad del vehículo en el rango de tiempo solicitado
+// Verificar la disponibilidad del vehículo en el rango de tiempo solicitado
+func (r *Reservation) IsVehicleAvailable(db *sql.DB) (bool, error) {
+	query := `SELECT COUNT(*) FROM reservations 
+              WHERE vehicle_id = $1 
+              AND status = 'activa' 
+              AND ((start_time <= $2 AND end_time >= $2) 
+              OR (start_time <= $3 AND end_time >= $3) 
+              OR ($2 <= start_time AND $3 >= start_time))`
+
+	var count int
+	err := db.QueryRow(query, r.VehicleID, r.StartTime, r.EndTime).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+
+	if count > 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 // Actualizar reserva
 func (r *Reservation) Update(db *sql.DB, reservationID int) error {
 	query := `UPDATE reservations SET start_time = $1, end_time = $2, status = $3 

@@ -31,7 +31,16 @@ func CreateReservation(c *gin.Context) {
 	// Set start and end time for the reservation
 	reservation.StartTime = time.Now()
 	reservation.EndTime = time.Now().Add(2 * time.Hour)
-
+	// Verificar la disponibilidad del vehículo
+	isAvailable, err := reservation.IsVehicleAvailable(config.DB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al verificar la disponibilidad del vehículo"})
+		return
+	}
+	if !isAvailable {
+		c.JSON(http.StatusConflict, gin.H{"error": "El vehículo no está disponible en el rango de tiempo solicitado"})
+		return
+	}
 	// Create the reservation in the database
 	if err := reservation.Create(config.DB); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -112,6 +121,42 @@ func GetAllReservation(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, reservations)
+}
+
+// Controlador para verificar la disponibilidad de un vehículo
+func CheckVehicleAvailability(c *gin.Context) {
+	var input struct {
+		VehicleID int       `json:"vehicle_id" binding:"required"`
+		StartTime time.Time `json:"start_time" binding:"required"`
+		EndTime   time.Time `json:"end_time" binding:"required"`
+	}
+
+	// Verificar si los datos proporcionados son válidos
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+		return
+	}
+
+	// Crear una reserva temporal para hacer la verificación
+	reservation := models.Reservation{
+		VehicleID: input.VehicleID,
+		StartTime: input.StartTime,
+		EndTime:   input.EndTime,
+	}
+
+	// Verificar la disponibilidad del vehículo
+	isAvailable, err := reservation.IsVehicleAvailable(config.DB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al verificar la disponibilidad del vehículo"})
+		return
+	}
+
+	// Responder si está disponible o no
+	if !isAvailable {
+		c.JSON(http.StatusOK, gin.H{"available": false, "message": "El vehículo no está disponible en el rango de tiempo solicitado"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"available": true, "message": "El vehículo está disponible"})
+	}
 }
 
 // UpdateReservation updates a specific reservation by ID

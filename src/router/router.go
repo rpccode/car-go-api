@@ -40,7 +40,7 @@ func SetupRoutes(r *gin.Engine) {
 		// Rutas de vehículos
 		protected.GET("/vehicles", controllers.ListVehicles)   // Listar vehículos disponibles
 		protected.GET("/vehicles/:id", controllers.GetVehicle) // Obtener información de un vehículo específico
-
+		protected.POST("/api/vehicles/check-availability", controllers.CheckVehicleAvailability)
 		// Rutas de personajes
 		protected.GET("/characters/fetch-all", controllers.FetchAndSaveAllCharacters) // Obtener y guardar todos los personajes
 		protected.GET("/characters", controllers.GetPaginatedCharacters)              // Obtener personajes con paginación y búsqueda
