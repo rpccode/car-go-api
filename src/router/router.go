@@ -24,7 +24,7 @@ func SetupRoutes(r *gin.Engine) {
 		})
 
 		// Rutas de reservas
-		protected.POST("/reservations", controllers.CreateReservation)
+		protected.POST("/reservations/All", controllers.CreateReservation)
 		protected.GET("/reservations/:id", controllers.GetReservation)       // Obtener una reserva específica
 		protected.PUT("/reservations/:id", controllers.UpdateReservation)    // Actualizar una reserva
 		protected.DELETE("/reservations/:id", controllers.DeleteReservation) // Eliminar una reserva
