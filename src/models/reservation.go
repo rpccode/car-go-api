@@ -41,6 +41,28 @@ func (r *Reservation) GetByID(db *sql.DB, id int) error {
 	return db.QueryRow(query, id).Scan(&r.UserID, &r.VehicleID, &r.StartTime, &r.EndTime, &r.Status)
 }
 
+func (r *Reservation) GetAll(db *sql.DB) ([]Reservation, error) {
+	query := `SELECT id, user_id, vehicle_id, start_time, end_time, status FROM reservations`
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reservations []Reservation
+	for rows.Next() {
+		var res Reservation
+		if err := rows.Scan(&res.ID, &res.UserID, &res.VehicleID, &res.StartTime, &res.EndTime, &res.Status); err != nil {
+			return nil, err
+		}
+		reservations = append(reservations, res)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return reservations, nil
+}
+
 // Actualizar reserva
 func (r *Reservation) Update(db *sql.DB, reservationID int) error {
 	query := `UPDATE reservations SET start_time = $1, end_time = $2, status = $3 

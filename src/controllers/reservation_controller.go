@@ -103,6 +103,16 @@ func GetReservation(c *gin.Context) {
 
 	c.JSON(http.StatusOK, reservation)
 }
+func GetAllReservation(c *gin.Context) {
+	var reservation models.Reservation
+	reservations, err := reservation.GetAll(config.DB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudieron obtener las reservas"})
+		return
+	}
+
+	c.JSON(http.StatusOK, reservations)
+}
 
 // UpdateReservation updates a specific reservation by ID
 func UpdateReservation(c *gin.Context) {

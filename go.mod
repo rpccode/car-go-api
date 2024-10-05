@@ -9,7 +9,12 @@ require (
 	golang.org/x/crypto v0.23.0
 )
 
-require github.com/joho/godotenv v1.5.1 // indirect
+require (
+	github.com/baijum/refresh v0.0.0-20150822061304-8bf3ab244e6d // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/pilu/config v0.0.0-20131214182432-3eb99e6c0b9a // indirect
+	gopkg.in/fsnotify.v1 v1.4.7 // indirect
+)
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
