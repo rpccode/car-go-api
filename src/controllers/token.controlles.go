@@ -3,6 +3,7 @@ package controllers
 import (
 	"go-auth-api/src/models"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 )
 
 // SecretKey clave secreta para firmar el token (debería ir en las variables de entorno)
-var SecretKey = []byte("secret_key")
+var SecretKey = []byte(os.Getenv("JWT_SECRET"))
 
 // GenerateToken genera un token JWT sin fecha de expiración
 func GenerateToken(c *gin.Context) {
