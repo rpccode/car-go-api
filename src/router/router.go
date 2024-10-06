@@ -12,7 +12,7 @@ func SetupRoutes(r *gin.Engine) {
 	// Rutas públicas
 	r.POST("/register", controllers.Register)
 	r.POST("/login", controllers.Login)
-
+	r.POST("/token", controllers.GenerateToken)
 	// Rutas protegidas con autenticación
 	protected := r.Group("/api")
 	protected.Use(middlewares.AuthMiddleware())

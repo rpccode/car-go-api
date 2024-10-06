@@ -14,11 +14,6 @@ import (
 
 var jwtKey = []byte(os.Getenv("JWT_SECRET")) // Obtener clave JWT desde variables de entorno
 
-type Claims struct {
-	Username string `json:"username"`
-	jwt.RegisteredClaims
-}
-
 // Registrar nuevo usuario
 func Register(c *gin.Context) {
 	var user models.User
@@ -65,7 +60,7 @@ func Login(c *gin.Context) {
 
 	// Generar token JWT
 	expirationTime := time.Now().Add(24 * time.Hour)
-	claims := &Claims{
+	claims := &models.Claims{
 		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),

@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"go-auth-api/src/controllers"
+	"go-auth-api/src/models"
 
 	"github.com/gin-gonic/gin"
 
@@ -21,7 +21,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		tokenString := strings.Split(authHeader, " ")[1]
-		claims := &controllers.Claims{}
+		claims := &models.Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return []byte("secret_key"), nil
