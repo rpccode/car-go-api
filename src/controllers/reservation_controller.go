@@ -133,7 +133,7 @@ func CheckVehicleAvailability(c *gin.Context) {
 
 	// Verificar si los datos proporcionados son válidos
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos", "err": err})
 		return
 	}
 
