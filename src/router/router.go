@@ -29,6 +29,7 @@ func SetupRoutes(r *gin.Engine) {
 		protected.GET("/reservations/:id", controllers.GetReservation)       // Obtener una reserva específica
 		protected.PUT("/reservations/:id", controllers.UpdateReservation)    // Actualizar una reserva
 		protected.DELETE("/reservations/:id", controllers.DeleteReservation) // Eliminar una reserva
+		protected.POST("/reservations/check-availability", controllers.CheckVehicleAvailability)
 
 		// Rutas de notificaciones
 		protected.POST("/notifications", controllers.SendNotification)
@@ -40,7 +41,7 @@ func SetupRoutes(r *gin.Engine) {
 		// Rutas de vehículos
 		protected.GET("/vehicles", controllers.ListVehicles)   // Listar vehículos disponibles
 		protected.GET("/vehicles/:id", controllers.GetVehicle) // Obtener información de un vehículo específico
-		protected.POST("/api/vehicles/check-availability", controllers.CheckVehicleAvailability)
+		protected.POST("/vehicles/check-availability", controllers.CheckVehicleAvailability)
 		// Rutas de personajes
 		protected.GET("/characters/fetch-all", controllers.FetchAndSaveAllCharacters) // Obtener y guardar todos los personajes
 		protected.GET("/characters", controllers.GetPaginatedCharacters)              // Obtener personajes con paginación y búsqueda
