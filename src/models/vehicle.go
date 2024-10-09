@@ -6,9 +6,9 @@ import (
 )
 
 // Define custom types
-type VehicleType string
-type FuelType string
-type VehicleStatus string
+type VehicleType *string
+type FuelType *string
+type VehicleStatus *string
 type Rating float64
 
 // Vehicle struct represents the vehicle model
@@ -70,21 +70,34 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
 	var vehicles []Vehicle
 	for rows.Next() {
 		var v Vehicle
+		var typeStr, fuelTypeStr, statusStr sql.NullString // Use sql.NullString for nullable fields
 		if err := rows.Scan(&v.ID, &v.Brand, &v.Model, &v.LicensePlate, &v.Latitude, &v.Longitude,
-			&v.Type, &v.FuelType, &v.Distance, &v.FuelEfficiency, &v.FuelConsumption,
-			&v.PricePerMinute, &v.PricePerMile, &v.Status, &v.ImageURL,
+			&typeStr, &fuelTypeStr, &v.Distance, &v.FuelEfficiency, &v.FuelConsumption,
+			&v.PricePerMinute, &v.PricePerMile, &statusStr, &v.ImageURL,
 			&v.Rating, &v.IsBooked, &v.IsReserved, &v.IsAvailable,
 			&v.IsRented, &v.IsFavorited, &v.IsEconomic, &v.IsLuxury,
 		); err != nil {
 			return nil, err
 		}
+
+		// Set the nullable fields to the vehicle struct
+		if typeStr.Valid {
+			v.Type = &typeStr.String
+		}
+		if fuelTypeStr.Valid {
+			v.FuelType = &fuelTypeStr.String
+		}
+		if statusStr.Valid {
+			v.Status = &statusStr.String
+		}
+
 		vehicles = append(vehicles, v)
 	}
 	return vehicles, nil
 }
 
 // GetByID retrieves a vehicle by its ID
-func (v *Vehicle) GetByID(db *sql.DB, id int) error { // Changed id type to string
+func (v *Vehicle) GetByID(db *sql.DB, id int) error {
 	query := `SELECT id, brand, model, license_plate, latitude, longitude, 
                      type, fuel_type, distance, fuel_efficiency, 
                      fuel_consumption, price_per_minute, price_per_mile, 
@@ -129,14 +142,26 @@ func GetAllAvailableVehicles(db *sql.DB, startTime, endTime time.Time) ([]Vehicl
 	var vehicles []Vehicle
 	for rows.Next() {
 		var v Vehicle
+		var typeStr, fuelTypeStr, statusStr sql.NullString
 		if err := rows.Scan(&v.ID, &v.Brand, &v.Model, &v.LicensePlate, &v.Latitude, &v.Longitude,
-			&v.Type, &v.FuelType, &v.Distance, &v.FuelEfficiency, &v.FuelConsumption,
-			&v.PricePerMinute, &v.PricePerMile, &v.Status, &v.ImageURL,
+			&typeStr, &fuelTypeStr, &v.Distance, &v.FuelEfficiency, &v.FuelConsumption,
+			&v.PricePerMinute, &v.PricePerMile, &statusStr, &v.ImageURL,
 			&v.Rating, &v.IsBooked, &v.IsReserved, &v.IsAvailable,
 			&v.IsRented, &v.IsFavorited, &v.IsEconomic, &v.IsLuxury,
 		); err != nil {
 			return nil, err
 		}
+
+		if typeStr.Valid {
+			v.Type = &typeStr.String
+		}
+		if fuelTypeStr.Valid {
+			v.FuelType = &fuelTypeStr.String
+		}
+		if statusStr.Valid {
+			v.Status = &statusStr.String
+		}
+
 		vehicles = append(vehicles, v)
 	}
 	return vehicles, nil
