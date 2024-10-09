@@ -123,8 +123,16 @@ func GetAllReservation(c *gin.Context) {
 	c.JSON(http.StatusOK, reservations)
 }
 
-// Controlador para verificar la disponibilidad de un vehículo
 func CheckVehicleAvailability(c *gin.Context) {
+	// Verificar si el cuerpo de la solicitud está vacío
+	if c.Request.Body == http.NoBody {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "El cuerpo de la solicitud está vacío",
+			"details": "Por favor, envíe los datos requeridos en formato JSON",
+		})
+		return
+	}
+
 	var input struct {
 		VehicleID int       `json:"vehicle_id" binding:"required"`
 		StartTime time.Time `json:"start_time" binding:"required"`
@@ -133,7 +141,10 @@ func CheckVehicleAvailability(c *gin.Context) {
 
 	// Verificar si los datos proporcionados son válidos
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos", "err": err})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Datos inválidos",
+			"details": err.Error(),
+		})
 		return
 	}
 
@@ -153,9 +164,15 @@ func CheckVehicleAvailability(c *gin.Context) {
 
 	// Responder si está disponible o no
 	if !isAvailable {
-		c.JSON(http.StatusOK, gin.H{"available": false, "message": "El vehículo no está disponible en el rango de tiempo solicitado"})
+		c.JSON(http.StatusOK, gin.H{
+			"available": false,
+			"message":   "El vehículo no está disponible en el rango de tiempo solicitado",
+		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"available": true, "message": "El vehículo está disponible"})
+		c.JSON(http.StatusOK, gin.H{
+			"available": true,
+			"message":   "El vehículo está disponible",
+		})
 	}
 }
 
@@ -197,4 +214,49 @@ func DeleteReservation(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Reserva eliminada correctamente"})
+}
+
+// GetReservationsByDateRange retrieves all reservations within a specified date range
+func GetReservationsByDateRange(c *gin.Context) {
+	// Obtener los parámetros de fecha desde la URL
+	startDateStr := c.Query("start_date")
+	endDateStr := c.Query("end_date")
+
+	// Verificar que los parámetros no estén vacíos
+	if startDateStr == "" || endDateStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Los parámetros start_date y end_date son requeridos"})
+		return
+	}
+
+	// Parsear las fechas de cadena a objetos time.Time
+	startDate, err := time.Parse("2006-01-02", startDateStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de start_date inválido. Usa YYYY-MM-DD"})
+		return
+	}
+
+	endDate, err := time.Parse("2006-01-02", endDateStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de end_date inválido. Usa YYYY-MM-DD"})
+		return
+	}
+
+	// Asegurarse de que la fecha de inicio no sea posterior a la fecha de finalización
+	if startDate.After(endDate) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "start_date no puede ser posterior a end_date"})
+		return
+	}
+
+	// Crear una instancia de Reservation
+	var reservation models.Reservation
+
+	// Obtener las reservas en el rango de fechas desde la base de datos
+	reservations, err := reservation.GetByDateRange(config.DB, startDate, endDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudieron obtener las reservas"})
+		return
+	}
+
+	// Responder con las reservas encontradas
+	c.JSON(http.StatusOK, reservations)
 }

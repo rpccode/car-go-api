@@ -39,7 +39,8 @@ func SetupRoutes(r *gin.Engine) {
 		protected.GET("/notifications/:user_id", controllers.GetUserNotifications) // Obtener notificaciones del usuario
 
 		// Rutas de vehículos
-		protected.GET("/vehicles", controllers.ListVehicles)   // Listar vehículos disponibles
+		protected.GET("/vehicles", controllers.ListVehicles) // Listar vehículos disponibles
+		protected.GET("/vehicules/available-vehicles", controllers.GetAvailableVehicles)
 		protected.GET("/vehicles/:id", controllers.GetVehicle) // Obtener información de un vehículo específico
 		protected.POST("/vehicles/check-availability", controllers.CheckVehicleAvailability)
 		// Rutas de personajes

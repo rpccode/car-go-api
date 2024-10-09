@@ -5,6 +5,7 @@ import (
 	"go-auth-api/src/models"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,6 +42,34 @@ func UpdateVehicleStatus(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Estado del vehículo actualizado"})
+}
+func GetAvailableVehicles(c *gin.Context) {
+	// Parse the start_time and end_time from the request query parameters
+	startTimeStr := c.Query("start_time")
+	endTimeStr := c.Query("end_time")
+
+	// Convert the string parameters to time.Time
+	startTime, err := time.Parse(time.RFC3339, startTimeStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Fecha de inicio inválida"})
+		return
+	}
+
+	endTime, err := time.Parse(time.RFC3339, endTimeStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Fecha de finalización inválida"})
+		return
+	}
+
+	// Lógica para obtener los vehículos disponibles
+	vehicles, err := models.GetAllAvailableVehicles(config.DB, startTime, endTime)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudieron obtener los vehículos disponibles"})
+		return
+	}
+
+	// Retornar la lista de vehículos disponibles
+	c.JSON(http.StatusOK, vehicles)
 }
 
 // ListVehicles retrieves all vehicles

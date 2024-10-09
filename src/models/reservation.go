@@ -100,3 +100,27 @@ func DeleteReservation(db *sql.DB, id int) error {
 	_, err := db.Exec(query, id)
 	return err
 }
+
+func (r *Reservation) GetByDateRange(db *sql.DB, startDate, endDate time.Time) ([]Reservation, error) {
+	query := `SELECT id, user_id, vehicle_id, start_time, end_time, status
+              FROM reservations
+              WHERE start_time >= $1 AND end_time <= $2`
+	rows, err := db.Query(query, startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reservations []Reservation
+	for rows.Next() {
+		var res Reservation
+		if err := rows.Scan(&res.ID, &res.UserID, &res.VehicleID, &res.StartTime, &res.EndTime, &res.Status); err != nil {
+			return nil, err
+		}
+		reservations = append(reservations, res)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return reservations, nil
+}
