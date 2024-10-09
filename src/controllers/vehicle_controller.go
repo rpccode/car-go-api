@@ -51,20 +51,20 @@ func GetAvailableVehicles(c *gin.Context) {
 	// Convert the string parameters to time.Time
 	startTime, err := time.Parse(time.RFC3339, startTimeStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Fecha de inicio inválida"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Fecha de inicio inválida", "err": err.Error()})
 		return
 	}
 
 	endTime, err := time.Parse(time.RFC3339, endTimeStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Fecha de finalización inválida"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Fecha de finalización inválida", "err": err, "endTime": endTime})
 		return
 	}
 
 	// Lógica para obtener los vehículos disponibles
 	vehicles, err := models.GetAllAvailableVehicles(config.DB, startTime, endTime)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudieron obtener los vehículos disponibles"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudieron obtener los vehículos disponibles", "err": err})
 		return
 	}
 
@@ -76,7 +76,7 @@ func GetAvailableVehicles(c *gin.Context) {
 func ListVehicles(c *gin.Context) {
 	vehicles, err := models.GetAllVehicles(config.DB)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudieron obtener los vehículos"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudieron obtener los vehículos", "err": err.Error()})
 		return
 	}
 
@@ -87,9 +87,14 @@ func ListVehicles(c *gin.Context) {
 func GetVehicle(c *gin.Context) {
 	id := c.Param("id")
 	var vehicle models.Vehicle
-	vehicleID, err := strconv.Atoi(id)
+	vehicleID, err := strconv.Atoi(id) // Convert string ID to int
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido", "err": err.Error()})
+		return
+	}
+
 	if err = vehicle.GetByID(config.DB, vehicleID); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Vehículo no encontrado"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Vehículo no encontrado", "err": err})
 		return
 	}
 
