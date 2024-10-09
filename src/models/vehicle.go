@@ -31,7 +31,7 @@ func (v *Vehicle) UpdateStatus(db *sql.DB, status string) error {
 
 // Obtener todos los vehículos
 func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
-	query := `SELECT id, license_plate, brand, model, status, latitude, longitude FROM vehicles`
+	query := `SELECT *  FROM vehicles`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
 
 // Obtener vehículo por ID
 func (v *Vehicle) GetByID(db *sql.DB, id int) error {
-	query := `SELECT license_plate, brand, model, status, latitude, longitude 
+	query := `SELECT * 
               FROM vehicles WHERE id = $1`
 	return db.QueryRow(query, id).Scan(&v.LicensePlate, &v.Brand, &v.Model, &v.Status, &v.Latitude, &v.Longitude)
 }
@@ -59,7 +59,7 @@ func (v *Vehicle) GetByID(db *sql.DB, id int) error {
 // Obtener vehículos disponibles en un rango de fechas
 func GetAllAvailableVehicles(db *sql.DB, startTime, endTime time.Time) ([]Vehicle, error) {
 	query := `
-        SELECT v.id, v.license_plate, v.brand, v.model, v.status, v.latitude, v.longitude
+        SELECT * 
         FROM vehicles v
         WHERE v.id NOT IN (
             SELECT vehicle_id 

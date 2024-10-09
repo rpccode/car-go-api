@@ -36,13 +36,13 @@ func (r *Reservation) Create(db *sql.DB) error {
 	return db.QueryRow(query, r.UserID, r.VehicleID, r.StartTime, r.EndTime).Scan(&r.ID)
 }
 func (r *Reservation) GetByID(db *sql.DB, id int) error {
-	query := `SELECT user_id, vehicle_id, start_time, end_time, status 
+	query := `SELECT * 
               FROM reservations WHERE id = $1`
 	return db.QueryRow(query, id).Scan(&r.UserID, &r.VehicleID, &r.StartTime, &r.EndTime, &r.Status)
 }
 
 func (r *Reservation) GetAll(db *sql.DB) ([]Reservation, error) {
-	query := `SELECT id, user_id, vehicle_id, start_time, end_time, status FROM reservations`
+	query := `SELECT *  FROM reservations`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func DeleteReservation(db *sql.DB, id int) error {
 }
 
 func (r *Reservation) GetByDateRange(db *sql.DB, startDate, endDate time.Time) ([]Reservation, error) {
-	query := `SELECT id, user_id, vehicle_id, start_time, end_time, status
+	query := `SELECT * 
               FROM reservations
               WHERE start_time >= $1 AND end_time <= $2`
 	rows, err := db.Query(query, startDate, endDate)
