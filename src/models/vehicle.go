@@ -9,7 +9,7 @@ import (
 type VehicleType sql.NullString
 type FuelType sql.NullString
 type VehicleStatus sql.NullString
-type Rating sql.NullFloat64
+type Rating sql.NullInt16
 
 // Vehicle struct represents the vehicle model with all fields as nullable
 type Vehicle struct {
