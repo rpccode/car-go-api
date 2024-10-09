@@ -36,11 +36,6 @@ type Vehicle struct {
 	IsFavorited     bool          `json:"is_favorited"`
 	IsEconomic      bool          `json:"is_economic"`
 	IsLuxury        bool          `json:"is_luxury"`
-	IsOpen          bool          `json:"is_open"`
-	IsClosed        bool          `json:"is_closed"`
-	IsRental        bool          `json:"is_rental"`
-	CreatedAt       time.Time     `json:"created_at"`
-	UpdatedAt       time.Time     `json:"updated_at"`
 }
 
 // UpdateLocation updates the vehicle's latitude and longitude
@@ -64,8 +59,7 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
                      fuel_consumption, price_per_minute, price_per_mile, 
                      status, image_url, rating, is_booked, is_reserved, 
                      is_available, is_rented, is_favorited, 
-                     is_economic, is_luxury, is_open, is_closed, 
-                     is_rental, created_at, updated_at 
+                     is_economic, is_luxury
               FROM vehicles`
 	rows, err := db.Query(query)
 	if err != nil {
@@ -81,7 +75,7 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
 			&v.PricePerMinute, &v.PricePerMile, &v.Status, &v.ImageURL,
 			&v.Rating, &v.IsBooked, &v.IsReserved, &v.IsAvailable,
 			&v.IsRented, &v.IsFavorited, &v.IsEconomic, &v.IsLuxury,
-			&v.IsOpen, &v.IsClosed, &v.IsRental, &v.CreatedAt, &v.UpdatedAt); err != nil {
+		); err != nil {
 			return nil, err
 		}
 		vehicles = append(vehicles, v)
@@ -96,8 +90,7 @@ func (v *Vehicle) GetByID(db *sql.DB, id int) error { // Changed id type to stri
                      fuel_consumption, price_per_minute, price_per_mile, 
                      status, image_url, rating, is_booked, is_reserved, 
                      is_available, is_rented, is_favorited, 
-                     is_economic, is_luxury, is_open, is_closed, 
-                     is_rental, created_at, updated_at 
+                     is_economic, is_luxury 
               FROM vehicles WHERE id = $1`
 	return db.QueryRow(query, id).Scan(&v.ID, &v.Brand, &v.Model, &v.LicensePlate,
 		&v.Latitude, &v.Longitude, &v.Type, &v.FuelType,
@@ -105,7 +98,7 @@ func (v *Vehicle) GetByID(db *sql.DB, id int) error { // Changed id type to stri
 		&v.PricePerMinute, &v.PricePerMile, &v.Status, &v.ImageURL,
 		&v.Rating, &v.IsBooked, &v.IsReserved, &v.IsAvailable,
 		&v.IsRented, &v.IsFavorited, &v.IsEconomic, &v.IsLuxury,
-		&v.IsOpen, &v.IsClosed, &v.IsRental, &v.CreatedAt, &v.UpdatedAt)
+	)
 }
 
 // GetAllAvailableVehicles retrieves available vehicles within a date range
@@ -116,8 +109,7 @@ func GetAllAvailableVehicles(db *sql.DB, startTime, endTime time.Time) ([]Vehicl
                fuel_consumption, price_per_minute, price_per_mile, 
                status, image_url, rating, is_booked, is_reserved, 
                is_available, is_rented, is_favorited, 
-               is_economic, is_luxury, is_open, is_closed, 
-               is_rental, created_at, updated_at 
+               is_economic, is_luxury
         FROM vehicles v
         WHERE v.id NOT IN (
             SELECT vehicle_id 
@@ -142,7 +134,7 @@ func GetAllAvailableVehicles(db *sql.DB, startTime, endTime time.Time) ([]Vehicl
 			&v.PricePerMinute, &v.PricePerMile, &v.Status, &v.ImageURL,
 			&v.Rating, &v.IsBooked, &v.IsReserved, &v.IsAvailable,
 			&v.IsRented, &v.IsFavorited, &v.IsEconomic, &v.IsLuxury,
-			&v.IsOpen, &v.IsClosed, &v.IsRental, &v.CreatedAt, &v.UpdatedAt); err != nil {
+		); err != nil {
 			return nil, err
 		}
 		vehicles = append(vehicles, v)
