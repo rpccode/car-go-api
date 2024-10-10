@@ -9,7 +9,7 @@ import (
 type VehicleType sql.NullString
 type FuelType sql.NullString
 type VehicleStatus sql.NullString
-type Rating sql.NullInt16
+type Rating sql.NullFloat64 // Changed to sql.NullFloat64 to handle decimal/float rating
 
 // Vehicle struct represents the vehicle model with all fields as nullable
 type Vehicle struct {
@@ -28,7 +28,7 @@ type Vehicle struct {
 	PricePerMile    sql.NullFloat64 `json:"price_per_mile"`
 	Status          VehicleStatus   `json:"status"`
 	ImageURL        sql.NullString  `json:"image_url"`
-	Rating          Rating          `json:"rating"`
+	Rating          Rating          `json:"rating"` // Updated to sql.NullFloat64 to handle float rating
 	IsBooked        sql.NullBool    `json:"is_booked"`
 	IsReserved      sql.NullBool    `json:"is_reserved"`
 	IsAvailable     sql.NullBool    `json:"is_available"`
@@ -70,7 +70,7 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
 	var vehicles []Vehicle
 	for rows.Next() {
 		var v Vehicle
-		var typeStr, fuelTypeStr, statusStr sql.NullString // Use sql.NullString for nullable fields
+		var typeStr, fuelTypeStr, statusStr sql.NullString
 		if err := rows.Scan(&v.ID, &v.Brand, &v.Model, &v.LicensePlate, &v.Latitude, &v.Longitude,
 			&typeStr, &fuelTypeStr, &v.Distance, &v.FuelEfficiency, &v.FuelConsumption,
 			&v.PricePerMinute, &v.PricePerMile, &statusStr, &v.ImageURL,
