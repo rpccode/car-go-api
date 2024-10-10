@@ -28,7 +28,7 @@ type Vehicle struct {
 	PricePerMile    sql.NullFloat64 `json:"price_per_mile"`
 	Status          VehicleStatus   `json:"status"`
 	ImageURL        sql.NullString  `json:"image_url"`
-	Rating          Rating          `json:"rating"` // Updated to sql.NullFloat64 to handle float rating
+	Rating          sql.NullInt64   `json:"rating"` // Updated to sql.NullFloat64 to handle float rating
 	IsBooked        sql.NullBool    `json:"is_booked"`
 	IsReserved      sql.NullBool    `json:"is_reserved"`
 	IsAvailable     sql.NullBool    `json:"is_available"`
