@@ -5,41 +5,41 @@ import (
 	"time"
 )
 
-// Define custom types for nullable values
-type VehicleType sql.NullString
-type FuelType sql.NullString
-type VehicleStatus sql.NullString
-type Rating sql.NullInt64 // Changed to sql.NullFloat64 to handle decimal/float rating
+// Define custom types
+type VehicleType *string
+type FuelType *string
+type VehicleStatus *string
+type Rating float64
 
-// Vehicle struct represents the vehicle model with all fields as nullable
+// Vehicle struct represents the vehicle model
 type Vehicle struct {
-	ID              sql.NullInt64   `json:"id"`
-	Brand           sql.NullString  `json:"brand"`
-	Model           sql.NullString  `json:"model"`
-	LicensePlate    sql.NullString  `json:"license_plate"`
-	Latitude        sql.NullFloat64 `json:"latitude"`
-	Longitude       sql.NullFloat64 `json:"longitude"`
-	Type            VehicleType     `json:"type"`
-	FuelType        FuelType        `json:"fuel_type"`
-	Distance        sql.NullFloat64 `json:"distance"`
-	FuelEfficiency  sql.NullFloat64 `json:"fuel_efficiency"`
-	FuelConsumption sql.NullFloat64 `json:"fuel_consumption"`
-	PricePerMinute  sql.NullFloat64 `json:"price_per_minute"`
-	PricePerMile    sql.NullFloat64 `json:"price_per_mile"`
-	Status          VehicleStatus   `json:"status"`
-	ImageURL        sql.NullString  `json:"image_url"`
-	Rating          sql.NullInt64   `json:"rating"` // Updated to sql.NullFloat64 to handle float rating
-	IsBooked        sql.NullBool    `json:"is_booked"`
-	IsReserved      sql.NullBool    `json:"is_reserved"`
-	IsAvailable     sql.NullBool    `json:"is_available"`
-	IsRented        sql.NullBool    `json:"is_rented"`
-	IsFavorited     sql.NullBool    `json:"is_favorited"`
-	IsEconomic      sql.NullBool    `json:"is_economic"`
-	IsLuxury        sql.NullBool    `json:"is_luxury"`
+	ID              int           `json:"id"`
+	Brand           string        `json:"brand"`
+	Model           string        `json:"model"`
+	LicensePlate    string        `json:"license_plate"`
+	Latitude        float64       `json:"latitude"`
+	Longitude       float64       `json:"longitude"`
+	Type            VehicleType   `json:"type"`
+	FuelType        FuelType      `json:"fuel_type"`
+	Distance        float64       `json:"distance"`
+	FuelEfficiency  float64       `json:"fuel_efficiency"`
+	FuelConsumption float64       `json:"fuel_consumption"`
+	PricePerMinute  float64       `json:"price_per_minute"`
+	PricePerMile    float64       `json:"price_per_mile"`
+	Status          VehicleStatus `json:"status"`
+	ImageURL        string        `json:"image_url"`
+	Rating          Rating        `json:"rating"`
+	IsBooked        bool          `json:"is_booked"`
+	IsReserved      bool          `json:"is_reserved"`
+	IsAvailable     bool          `json:"is_available"` // corrected to 'is_available'
+	IsRented        bool          `json:"is_rented"`
+	IsFavorited     bool          `json:"is_favorited"`
+	IsEconomic      bool          `json:"is_economic"`
+	IsLuxury        bool          `json:"is_luxury"`
 }
 
 // UpdateLocation updates the vehicle's latitude and longitude
-func (v *Vehicle) UpdateLocation(db *sql.DB, lat, long sql.NullFloat64) error {
+func (v *Vehicle) UpdateLocation(db *sql.DB, lat, long float64) error {
 	query := `UPDATE vehicles SET latitude = $1, longitude = $2 WHERE id = $3`
 	_, err := db.Exec(query, lat, long, v.ID)
 	return err
@@ -70,7 +70,7 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
 	var vehicles []Vehicle
 	for rows.Next() {
 		var v Vehicle
-		var typeStr, fuelTypeStr, statusStr sql.NullString
+		var typeStr, fuelTypeStr, statusStr sql.NullString // Use sql.NullString for nullable fields
 		if err := rows.Scan(&v.ID, &v.Brand, &v.Model, &v.LicensePlate, &v.Latitude, &v.Longitude,
 			&typeStr, &fuelTypeStr, &v.Distance, &v.FuelEfficiency, &v.FuelConsumption,
 			&v.PricePerMinute, &v.PricePerMile, &statusStr, &v.ImageURL,
@@ -78,6 +78,17 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
 			&v.IsRented, &v.IsFavorited, &v.IsEconomic, &v.IsLuxury,
 		); err != nil {
 			return nil, err
+		}
+
+		// Set the nullable fields to the vehicle struct
+		if typeStr.Valid {
+			v.Type = &typeStr.String
+		}
+		if fuelTypeStr.Valid {
+			v.FuelType = &fuelTypeStr.String
+		}
+		if statusStr.Valid {
+			v.Status = &statusStr.String
 		}
 
 		vehicles = append(vehicles, v)
@@ -139,6 +150,16 @@ func GetAllAvailableVehicles(db *sql.DB, startTime, endTime time.Time) ([]Vehicl
 			&v.IsRented, &v.IsFavorited, &v.IsEconomic, &v.IsLuxury,
 		); err != nil {
 			return nil, err
+		}
+
+		if typeStr.Valid {
+			v.Type = &typeStr.String
+		}
+		if fuelTypeStr.Valid {
+			v.FuelType = &fuelTypeStr.String
+		}
+		if statusStr.Valid {
+			v.Status = &statusStr.String
 		}
 
 		vehicles = append(vehicles, v)
