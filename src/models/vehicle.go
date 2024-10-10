@@ -9,7 +9,7 @@ import (
 type VehicleType sql.NullString
 type FuelType sql.NullString
 type VehicleStatus sql.NullString
-type Rating sql.NullFloat64 // Changed to sql.NullFloat64 to handle decimal/float rating
+type Rating sql.NullInt64 // Changed to sql.NullFloat64 to handle decimal/float rating
 
 // Vehicle struct represents the vehicle model with all fields as nullable
 type Vehicle struct {
