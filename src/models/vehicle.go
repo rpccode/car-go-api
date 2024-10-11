@@ -73,7 +73,7 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
                      p.price_per_minute, p.price_per_mile, v.status, v.rating, 
                      v.is_booked, v.is_reserved, v.is_available, v.is_rented, 
                      v.is_favorited, v.is_economic, v.is_luxury
-              FROM vehicle v
+              FROM vehicles v
               JOIN brand b ON v.brand_id = b.id
               JOIN model m ON v.model_id = m.id
               JOIN fuel_type ft ON v.fuel_type_id = ft.id
@@ -125,7 +125,7 @@ func (v *Vehicle) GetByID(db *sql.DB, id int) error {
                      p.price_per_minute, p.price_per_mile, v.status, v.rating, 
                      v.is_booked, v.is_reserved, v.is_available, v.is_rented, 
                      v.is_favorited, v.is_economic, v.is_luxury
-              FROM vehicle v
+              FROM vehicles v
               JOIN brand b ON v.brand_id = b.id
               JOIN model m ON v.model_id = m.id
               JOIN fuel_type ft ON v.fuel_type_id = ft.id
