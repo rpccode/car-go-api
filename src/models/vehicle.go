@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"time"
 )
 
 // Define custom types
@@ -143,4 +144,44 @@ func (v *Vehicle) GetByID(db *sql.DB, id int) error {
 	// Get vehicle images
 	v.Images, err = GetVehicleImages(db, v.ID)
 	return err
+}
+
+func (v *Vehicle) UpdateLocation(db *sql.DB, lat, long float64) error {
+	query := `UPDATE vehicles SET latitude = $1, longitude = $2 WHERE id = $3`
+	_, err := db.Exec(query, lat, long, v.ID)
+	return err
+}
+
+func (v *Vehicle) UpdateStatus(db *sql.DB, status string) error {
+	query := `UPDATE vehicles SET status = $1 WHERE id = $2`
+	_, err := db.Exec(query, status, v.ID)
+	return err
+}
+func GetAllAvailableVehicles(db *sql.DB, startTime, endTime time.Time) ([]Vehicle, error) {
+	query := `
+        SELECT id, brand, model, license_plate, latitude, longitude, status
+        FROM vehicles v
+        WHERE v.id NOT IN (
+            SELECT vehicle_id 
+            FROM reservations 
+            WHERE (start_time <= $1 AND end_time >= $1) 
+            OR (start_time <= $2 AND end_time >= $2)
+            OR ($1 <= start_time AND $2 >= start_time)
+        ) AND v.status = 'available'`
+
+	rows, err := db.Query(query, startTime, endTime)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var vehicles []Vehicle
+	for rows.Next() {
+		var v Vehicle
+		if err := rows.Scan(&v.ID, &v.Brand, &v.Model, &v.LicensePlate, &v.Latitude, &v.Longitude, &v.Status); err != nil {
+			return nil, err
+		}
+		vehicles = append(vehicles, v)
+	}
+	return vehicles, nil
 }

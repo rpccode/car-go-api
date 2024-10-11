@@ -35,14 +35,22 @@ func UpdateVehicleStatus(c *gin.Context) {
 		return
 	}
 
-	// Actualizar estado
-	if err := vehicle.UpdateStatus(config.DB, vehicle.Status); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar el estado"})
+	// Verificar si el estado es un puntero a string y no es nil
+	if vehicle.Status != nil {
+		// Actualizar estado del vehículo, desreferenciando el puntero
+		if err := vehicle.UpdateStatus(config.DB, *vehicle.Status); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar el estado"})
+			return
+		}
+	} else {
+		// Si el estado es nil, devolver un error o manejar según el caso
+		c.JSON(http.StatusBadRequest, gin.H{"error": "El estado del vehículo no puede ser nulo"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Estado del vehículo actualizado"})
 }
+
 func GetAvailableVehicles(c *gin.Context) {
 	// Parse the start_time and end_time from the request query parameters
 	startTimeStr := c.Query("start_time")
