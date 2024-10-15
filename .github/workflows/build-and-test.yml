@@ -1,6 +1,6 @@
 # .github/workflows/build-and-test.yml
 
-name: Build and Test
+name: Build and Test Go Application
 
 on:
   pull_request:
@@ -20,13 +20,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4
         with:
-          node-version: '16'  # Cambia a la versión de Node.js que uses
+          go-version: '1.23.1'  # Ajusta la versión de Go si es necesario
 
       - name: Install dependencies
-        run: npm install
+        run: go mod tidy
+
+      - name: Build the application
+        run: go build -v ./...
 
       - name: Run tests
-        run: npm run test
+        run: go test -v ./...
+
+      - name: Run lint
+        run: go vet ./...
