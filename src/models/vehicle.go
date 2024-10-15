@@ -68,7 +68,7 @@ func GetVehicleImages(db *sql.DB, vehicleID int) ([]VehicleImage, error) {
 
 // GetAllVehicles retrieves all vehicles from the database, including their images
 func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
-	query := `SELECT v.id, b.name, m.name, v.license_plate, v.latitude, v.longitude, 
+	query := `SELECT v.id, b.name, m.name, v.license_plate, 
                      ft.type, v.distance, v.fuel_efficiency, v.fuel_consumption, 
                      p.price_per_minute, p.price_per_mile, v.status, v.rating, 
                      v.is_booked, v.is_reserved, v.is_available, v.is_rented, 
@@ -120,7 +120,7 @@ func GetAllVehicles(db *sql.DB) ([]Vehicle, error) {
 
 // GetByID retrieves a vehicle by its ID, including its images
 func (v *Vehicle) GetByID(db *sql.DB, id int) error {
-	query := `SELECT v.id, b.name, m.name, v.license_plate, v.latitude, v.longitude, 
+	query := `SELECT v.id, b.name, m.name, v.license_plate, 
                      ft.type, v.distance, v.fuel_efficiency, v.fuel_consumption, 
                      p.price_per_minute, p.price_per_mile, v.status, v.rating, 
                      v.is_booked, v.is_reserved, v.is_available, v.is_rented, 
@@ -157,6 +157,9 @@ func (v *Vehicle) UpdateStatus(db *sql.DB, status string) error {
 	_, err := db.Exec(query, status, v.ID)
 	return err
 }
+
+//probando
+
 func GetAllAvailableVehicles(db *sql.DB, startTime, endTime time.Time) ([]Vehicle, error) {
 	query := `
         SELECT id, brand, model, license_plate, latitude, longitude, status
